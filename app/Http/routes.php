@@ -29,3 +29,14 @@ Route::get('/', function () {
 Route::group(['middleware' => ['web']], function () {
     //
 });
+
+/*
+|--------------------------------------------------------------------------
+| REST API Routes
+|--------------------------------------------------------------------------
+|
+| This route group for all our REST API endpoints
+|
+*/
+Route::resource('teachers', 'TeachersController');
+Route::resource('lessons', 'LessonsController');
