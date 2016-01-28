@@ -11,6 +11,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // $this->call(UserTableSeeder::class);
+        factory(LaravelAcademy\Teacher::class, 15)->create()->each(function($teacher) {
+            $teacher->lessons()->save(factory(LaravelAcademy\Lesson::class)->make());
+        });
     }
 }
