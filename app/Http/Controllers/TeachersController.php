@@ -4,6 +4,7 @@ namespace LaravelAcademy\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Validator;
 use LaravelAcademy\Teacher;
 use LaravelAcademy\Http\Requests;
 use EllipseSynergie\ApiResponse\Contracts\Response;
@@ -43,6 +44,18 @@ class TeachersController extends Controller
      */
     public function store(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:100|string',
+            'email' => 'required|email',
+            'funfact' => 'required|string',
+            'age' => 'required|numeric|min:18|max:67',
+        ]);
+
+        if ($validator->fails()) {
+            // TODO: Improve error messages ($validator->errors())
+            return $this->response->errorWrongArgs("Validation failed");
+        }
+
         Teacher::create($request->all());
     }
 
@@ -79,6 +92,18 @@ class TeachersController extends Controller
 
         if(!$teacher) {
             return $this->response->errorNotFound('Teacher not found');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'max:100|string',
+            'email' => 'email',
+            'funfact' => 'string',
+            'age' => 'numeric|min:18|max:67',
+        ]);
+
+        if ($validator->fails()) {
+            // TODO: Improve error messages ($validator->errors())
+            return $this->response->errorWrongArgs("Validation failed");
         }
 
         $teacher->fill($request->all())->save();
