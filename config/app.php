@@ -155,6 +155,7 @@ return [
         LaravelAcademy\Providers\AuthServiceProvider::class,
         LaravelAcademy\Providers\EventServiceProvider::class,
         LaravelAcademy\Providers\RouteServiceProvider::class,
+        EllipseSynergie\ApiResponse\Laravel\ResponseServiceProvider::class,
 
     ],
 

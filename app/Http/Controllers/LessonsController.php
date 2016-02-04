@@ -6,10 +6,20 @@ use Illuminate\Http\Request;
 
 use LaravelAcademy\Lesson;
 use LaravelAcademy\Http\Requests;
-use LaravelAcademy\Http\Controllers\Controller;
+use EllipseSynergie\ApiResponse\Contracts\Response;
+use LaravelAcademy\Transformers\LessonTransformer;
 
 class LessonsController extends Controller
 {
+    /**
+     * @param Response $response
+     * @internal param $Response
+     */
+    public function __construct(Response $response)
+    {
+        $this->response = $response;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -17,7 +27,12 @@ class LessonsController extends Controller
      */
     public function index()
     {
-        return Lesson::all();
+       $lessons = Lesson::paginate(15);
+
+        return $this->response->withPaginator(
+            $lessons,
+            new LessonTransformer
+        );
     }
 
     /**
@@ -39,7 +54,16 @@ class LessonsController extends Controller
      */
     public function show($id)
     {
-        return Lesson::findOrFail($id);
+        $lesson = Lesson::find($id);
+
+        if(!$lesson) {
+            return $this->response->errorNotFound('Lesson not found');
+        }
+
+        return $this->response->withItem(
+            $lesson,
+            new LessonTransformer
+        );
     }
 
     /**
@@ -51,7 +75,11 @@ class LessonsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $lesson = Lesson::findOrFail($id);
+        $lesson = Lesson::find($id);
+
+        if(!$lesson) {
+            return $this->response->errorNotFound('Lesson not found');
+        }
 
         $lesson->fill($request->all())->save();
     }
@@ -64,7 +92,11 @@ class LessonsController extends Controller
      */
     public function destroy($id)
     {
-        $lesson = Lesson::findOrFail($id);
+        $lesson = Lesson::find($id);
+
+        if(!$lesson) {
+            return $this->response->errorNotFound('Lesson not found');
+        }
 
         $lesson->delete();
     }

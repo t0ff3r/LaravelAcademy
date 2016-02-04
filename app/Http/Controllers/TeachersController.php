@@ -6,10 +6,20 @@ use Illuminate\Http\Request;
 
 use LaravelAcademy\Teacher;
 use LaravelAcademy\Http\Requests;
-use LaravelAcademy\Http\Controllers\Controller;
+use EllipseSynergie\ApiResponse\Contracts\Response;
+use LaravelAcademy\Transformers\TeacherTransformer;
 
 class TeachersController extends Controller
 {
+    /**
+     * @param Response $response
+     * @internal param $Response
+     */
+    public function __construct(Response $response)
+    {
+        $this->response = $response;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -17,7 +27,12 @@ class TeachersController extends Controller
      */
     public function index()
     {
-        return Teacher::all();
+        $teachers = Teacher::paginate(15);
+
+        return $this->response->withPaginator(
+            $teachers,
+            new TeacherTransformer
+        );
     }
 
     /**
@@ -39,7 +54,16 @@ class TeachersController extends Controller
      */
     public function show($id)
     {
-        return Teacher::findOrFail($id);
+        $teacher = Teacher::find($id);
+
+        if(!$teacher) {
+            return $this->response->errorNotFound('Teacher not found');
+        }
+
+        return $this->response->withItem(
+            $teacher,
+            new TeacherTransformer
+        );
     }
 
     /**
@@ -51,7 +75,11 @@ class TeachersController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $teacher = Teacher::findOrFail($id);
+        $teacher = Teacher::find($id);
+
+        if(!$teacher) {
+            return $this->response->errorNotFound('Teacher not found');
+        }
 
         $teacher->fill($request->all())->save();
     }
@@ -64,7 +92,11 @@ class TeachersController extends Controller
      */
     public function destroy($id)
     {
-        $teacher = Teacher::findOrFail($id);
+        $teacher = Teacher::find($id);
+
+        if(!$teacher) {
+            return $this->response->errorNotFound('Teacher not found');
+        }
 
         $teacher->delete();
     }
