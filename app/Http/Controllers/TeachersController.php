@@ -4,6 +4,7 @@ namespace LaravelAcademy\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use LaravelAcademy\Teacher;
 use LaravelAcademy\Http\Requests;
@@ -65,9 +66,17 @@ class TeachersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $teacher = Teacher::find($id);
+        // Bad
+        $teacher = Cache::remember('teacher-' . $id . '-' . serialize($request->all()), 5, function() use ($id) {
+            return Teacher::with('lessons')->find($id);
+        });
+
+        // Better
+        // $teacher = Cache::tags(['teachers', 'teacher-' . $id])->remember('teacher-' . $id . '-' . serialize($request->all()), 5, function() use ($id) {
+        //     return Teacher::with('lessons')->find($id);
+        // });
 
         if(!$teacher) {
             return $this->response->errorNotFound('Teacher not found');
@@ -107,6 +116,13 @@ class TeachersController extends Controller
         }
 
         $teacher->fill($request->all())->save();
+
+
+        // Bad
+        Cache::flush();
+
+        // Better
+        //Cache::tags('teacher-' . $id)->flush();
     }
 
     /**
@@ -124,5 +140,11 @@ class TeachersController extends Controller
         }
 
         $teacher->delete();
+
+        // Bad
+        Cache::flush();
+
+        // Better
+        //Cache::tags('teacher-' . $id)->flush();
     }
 }
