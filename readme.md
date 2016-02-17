@@ -943,31 +943,6 @@ TeachersController.php
       Teacher::create($request->all());
   }
 
-  public function update(Request $request, $id)
-  {
-      $teacher = Teacher::find($id);
-
-      if(!$teacher) {
-          return $this->response->errorNotFound('Teacher not found');
-      }
-
-      $validator = Validator::make($request->all(), [
-          'name' => 'max:100|string',
-          'email' => 'email',
-          'funfact' => 'string',
-          'age' => 'numeric|min:18|max:67',
-      ]);
-      
-      // This will actually fail on update if not all inputs are present.
-      // Should consider improving this.
-      if ($validator->fails()) {
-          // TODO: Improve error messages ($validator->errors())
-          return $this->response->errorWrongArgs("Validation failed");
-      }
-
-      $teacher->fill($request->all())->save();
-  }
-
 ```
 
 ## Cache
