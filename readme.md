@@ -925,23 +925,26 @@ We should definitely validate all input data in our API. This is easy with Larav
 
 TeachersController.php
 ```php
+// Import in top
+use Illuminate\Support\Facades\Validator;
 
-  public function store(Request $request)
-  {
-      $validator = Validator::make($request->all(), [
-          'name' => 'required|max:100|string',
-          'email' => 'required|email',
-          'funfact' => 'required|string',
-          'age' => 'required|numeric|min:18|max:67',
-      ]);
+// Function implementation
+public function store(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'name' => 'required|max:100|string',
+        'email' => 'required|email',
+        'funfact' => 'required|string',
+        'age' => 'required|numeric|min:18|max:67',
+    ]);
 
-      if ($validator->fails()) {
-          // TODO: Improve error messages ($validator->errors())
-          return $this->response->errorWrongArgs("Validation failed");
-      }
+    if ($validator->fails()) {
+        // TODO: Improve error messages ($validator->errors())
+        return $this->response->errorWrongArgs("Validation failed");
+    }
 
-      Teacher::create($request->all());
-  }
+    Teacher::create($request->all());
+}
 
 ```
 
@@ -951,47 +954,49 @@ Sometimes its a good idea to cache your database results. This might be if your 
 
 TeachersController.php
 ```php
+// Import in top
+use Illuminate\Support\Facades\Cache;
 
-  // Lets cache a single teacher
-  public function show(Request $request, $id)
-  {
-      // Bad
-      $teacher = Cache::remember('teacher-' . $id . '-' . serialize($request->all()), 5, function() use ($id) {
-          return Teacher::with('lessons')->find($id);
-      });
+// Lets cache a single teacher
+public function show(Request $request, $id)
+{
+    // Bad
+    $teacher = Cache::remember('teacher-' . $id . '-' . serialize($request->all()), 5, function() use ($id) {
+        return Teacher::with('lessons')->find($id);
+    });
 
-      // Better
-      // $teacher = Cache::tags(['teachers', 'teacher-' . $id])->remember('teacher-' . $id . '-' . serialize($request->all()), 5, function() use ($id) {
-      //     return Teacher::with('lessons')->find($id);
-      // });
+    // Better
+    // $teacher = Cache::tags(['teachers', 'teacher-' . $id])->remember('teacher-' . $id . '-' . serialize($request->all()), 5, function() use ($id) {
+    //     return Teacher::with('lessons')->find($id);
+    // });
 
-      if(!$teacher) {
-          return $this->response->errorNotFound('Teacher not found');
-      }
+    if(!$teacher) {
+        return $this->response->errorNotFound('Teacher not found');
+    }
 
-      return $this->response->withItem(
-          $teacher,
-          new TeacherTransformer
-      );
-  }
-  
-  // Remember to flush on destroy or update
-  public function destroy($id)
-  {
-      $teacher = Teacher::find($id);
+    return $this->response->withItem(
+        $teacher,
+        new TeacherTransformer
+    );
+}
 
-      if(!$teacher) {
-          return $this->response->errorNotFound('Teacher not found');
-      }
+// Remember to flush on destroy or update
+public function destroy($id)
+{
+    $teacher = Teacher::find($id);
 
-      $teacher->delete();
+    if(!$teacher) {
+        return $this->response->errorNotFound('Teacher not found');
+    }
 
-      // Bad
-      Cache::flush();
+    $teacher->delete();
 
-      // Better
-      //Cache::tags('teacher-' . $id)->flush();
-  }
+    // Bad
+    Cache::flush();
+
+    // Better
+    //Cache::tags('teacher-' . $id)->flush();
+}
   
 ```
 
