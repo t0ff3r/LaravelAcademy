@@ -28,7 +28,7 @@ This commands performs a number of things:
 One last thing we want todo is to give our application its own namespace
 
 ```bash
-php artisan app:name YourName
+php artisan app:name YourAppName
 ```
 
 ## Configure Homestead
