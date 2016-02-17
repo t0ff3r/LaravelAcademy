@@ -2,9 +2,9 @@
 ## Services we used
 
 + [Laravel 5.2](https://laravel.com/docs/5.2/)
-+ [GitHub](https://github.com/t0ff3r/LaravelAcademy/)
++ [GitHub](https://github.com/)
 + [Digital Ocean](https://www.digitalocean.com/)
-+ [Laravel Forge](forge.laravel.com/)
++ [Laravel Forge](https://forge.laravel.com/)
 
 ## Prerequisites
 
@@ -410,7 +410,7 @@ TeachersController.php
 ```php
 <?php
 
-namespace LaravelAcademy\Http\Controllers;
+namespace YourAppName\Http\Controllers;
 
 use Illuminate\Http\Request;
 
