@@ -224,6 +224,12 @@ class CreateLessonsTable extends Migration
 
 ```
 
+We can now re-run our migrations to get the new fields:
+
+```bash
+php artisan migrate:refresh
+```
+
 ## Models
 
 We also need models to represent our database tables. One model represents one table. Relations between the models needs to be defined in the models. We can scaffold our models with artisan like with everything else:
